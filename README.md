@@ -38,7 +38,7 @@ The project relies mainly on:
 
 - `pandas`
 - `requests`
-- `xlrd`
+- `openpyxl`
 
 Some MCX datasets are published as Excel files, so spreadsheet-reading support is required for part of the API.
 

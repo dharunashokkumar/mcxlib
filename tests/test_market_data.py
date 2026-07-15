@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import json
 import unittest
 from unittest.mock import patch
 
@@ -125,6 +126,74 @@ class AvailableContractsTest(unittest.TestCase):
 
     def test_get_available_contracts_is_exported(self):
         self.assertIs(mcxlib.get_available_contracts, market_data.get_available_contracts)
+
+
+class RequestPayloadTest(unittest.TestCase):
+    def _capture_payload(self, func, response, **kwargs):
+        with patch.object(market_data, "post_json", return_value=response) as mock_post:
+            func(**kwargs)
+        return mock_post.call_args.kwargs["payload"]
+
+    def test_get_bhav_copy_sends_valid_json_payload(self):
+        response = {"d": {"Data": [{"__type": "BhavCopy", "Symbol": "GOLD", "Open": 60000.0}]}}
+
+        payload = self._capture_payload(
+            market_data.get_bhav_copy,
+            response,
+            trade_date="20230102",
+            instrument="ALL",
+        )
+
+        self.assertEqual(json.loads(payload), {"Date": "20230102", "InstrumentName": "ALL"})
+
+    def test_get_option_chain_sends_valid_json_payload(self):
+        response = {
+            "d": {
+                "Data": [
+                    {
+                        "ExtensionData": None,
+                        "PE_LTT": "",
+                        "CE_LTT": "",
+                        "LTT": "",
+                        "Symbol": "CRUDEOIL",
+                        "CE_OpenInterest": 10,
+                        "PE_OpenInterest": 0,
+                        "StrikePrice": 6000,
+                    }
+                ]
+            }
+        }
+
+        payload = self._capture_payload(
+            market_data.get_option_chain,
+            response,
+            commodity="CRUDEOIL",
+            expiry="15NOV2023",
+        )
+
+        self.assertEqual(json.loads(payload), {"Commodity": "CRUDEOIL", "Expiry": "15NOV2023"})
+
+    def test_get_most_active_puts_calls_sends_valid_json_payload(self):
+        response = {
+            "d": {
+                "Data": [
+                    {"ExtensionData": None, "LTT": "", "Symbol": "CRUDEOIL", "Volume": 100}
+                ]
+            }
+        }
+
+        payload = self._capture_payload(
+            market_data.get_most_active_puts_calls,
+            response,
+            option_type="PE",
+            product="ALL",
+            instrument="OPTFUT",
+        )
+
+        self.assertEqual(
+            json.loads(payload),
+            {"OptionType": "PE", "Product": "ALL", "InstrumentType": "OPTFUT"},
+        )
 
 
 if __name__ == "__main__":

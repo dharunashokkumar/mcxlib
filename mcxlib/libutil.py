@@ -56,16 +56,15 @@ def validate_date_param(start_date:str, end_date:str):
     if not start_date or not end_date:
         raise ValueError(' Please provide the valid parameters')
     try:
-        start_date = datetime.strptime(start_date, '%Y%m%d')
-        end_date = datetime.strptime(end_date, '%Y%m%d')
-        time_delta = (end_date - start_date).days
-        if time_delta < 1:
-            raise ValueError(f'end_date should greater than start_date ')
-        elif time_delta > 365:
-            raise ValueError(f'Date range cannot be greater than 365 days')
-    except Exception as e:
-        print(e)
+        start = datetime.strptime(start_date, '%Y%m%d')
+        end = datetime.strptime(end_date, '%Y%m%d')
+    except (TypeError, ValueError):
         raise ValueError(f'either or both start_date = {start_date} || end_date = {end_date} are not valid value')
+    time_delta = (end - start).days
+    if time_delta < 0:
+        raise ValueError('end_date should not be earlier than start_date')
+    if time_delta > 365:
+        raise ValueError('Date range cannot be greater than 365 days')
 
 
 def get_mcxlib_path():

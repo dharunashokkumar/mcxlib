@@ -235,8 +235,11 @@ def get_most_active_puts_calls(option_type:str = 'PE',
     """
     headers = get_headers(use_for='most-active-puts-calls')
     url = "https://www.mcxindia.com/backpage.aspx/GetMostActiveOptionsContractsByVolume"
-    payload_param = {'OptionType':f'{option_type}','Product':f'{product}','InstrumentType':f'{instrument}'}
-    payload = f"{payload_param}"
+    payload = json.dumps({
+                            "OptionType": f"{option_type}",
+                            "Product": f"{product}",
+                            "InstrumentType": f"{instrument}"
+                        })
     try:
         data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
@@ -256,8 +259,10 @@ def get_bhav_copy(trade_date:str = '20230102',
     """
     headers = get_headers(use_for='bhavcopy')
     url = "https://www.mcxindia.com/backpage.aspx/GetDateWiseBhavCopy"
-    payload_param = {'Date': f'{trade_date}', 'InstrumentName': f'{instrument}'}
-    payload = f"{payload_param}"
+    payload = json.dumps({
+                            "Date": f"{trade_date}",
+                            "InstrumentName": f"{instrument}"
+                        })
     try:
         data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
@@ -352,8 +357,10 @@ def get_option_chain(commodity:str = 'CRUDEOIL', expiry:str = '15NOV2023') -> pd
     """
     headers = get_headers(use_for='option-chain')
     url = "https://www.mcxindia.com/backpage.aspx/GetOptionChain"
-    payload_param = {'Commodity':f'{commodity}','Expiry':f'{expiry}'}
-    payload = f"{payload_param}"
+    payload = json.dumps({
+                            "Commodity": f"{commodity}",
+                            "Expiry": f"{expiry}"
+                        })
     try:
         data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
@@ -464,7 +471,6 @@ def get_trading_statistics(year:int = 2023, month_number:int = 9) -> pd.DataFram
     try:
         url = (f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/"
                 f"{year}/{month_long}/trading-statistics-{month_short}-{year}.xlsx")
-        print(url)
         data_df = pd.read_excel(url, skipfooter=5)
     except Exception as e:
         raise ValueError(f" apply valid parameter : MCX error:{e}")

@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown", author='RuchiTanmay',
     author_email='ruchitanmay@gmail.com',
     url='https://github.com/RuchiTanmay/mcxlib',
-    install_requires=['requests', 'pandas'],
+    install_requires=['requests', 'pandas', 'openpyxl'],
     keywords=['mcx', 'mcx india', 'python', 'mcx data', 'mcx history data', 'commodity', 'mcx python',
               'mcx python library', 'mcx library'],
     classifiers=[
